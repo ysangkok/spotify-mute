@@ -1,32 +1,26 @@
 #!/bin/bash
 #
 #THIS IS A COMPILATION OF THE IDEAS OF NUMEROUS PEOPLE
-#works for the current version of spotify
+#works for version 1.0.9 of spotify
 
 # set commercial mute, so we do not neet to listen to them
 
-echo "----------------------------------------------------------"
-echo ""
-echo "   Mute spotify commercial"
-echo ""
-echo "----------------------------------------------------------"
-
 when-changed ~/bin/spotify_blacklist.txt -c "kill $$" &
 
-xprop -spy -id $(wmctrl -lx | awk -F' ' '$3 == "spotify.Spotify" {print $1}') WM_NAME |
+xprop -spy -id $(wmctrl -lx | awk -F' ' '$3 == "spotify.Spotify" {print $1}') _NET_WM_NAME |
 while read -r XPROPOUTPUT; do
         XPROP_TRACKDATA="$(echo "$XPROPOUTPUT" | cut -d \" -f 2 )"
 
         # show something
-        echo "XPROP:      $XPROP_TRACKDATA"
+        echo "Checking against: $XPROP_TRACKDATA"
 
-        if grep -Fxq "$XPROP_TRACKDATA" ~/bin/spotify_blacklist.txt
-        then
-            echo "commercial: yes"
-            amixer -D pulse set Master mute >> /dev/null
-        else
-            echo "commercial: no"
-            amixer -D pulse set Master unmute >> /dev/null
-        fi
-        echo "----------------------------------------------------------"
+        amixer -D pulse set Master unmute >> /dev/null
+	while read -r LINE; do
+            echo Checking $LINE
+            if grep -Fq "$LINE" <(echo "$XPROP_TRACKDATA"); then
+                echo "commercial: yes"
+                amixer -D pulse set Master mute >> /dev/null
+		break
+            fi
+	done < ~/bin/spotify_blacklist.txt
 done
