@@ -1,0 +1,3 @@
+[submodule "when-changed-git"]
+	path = when-changed-git
+	url = ./when-changed-git
