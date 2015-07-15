@@ -1,26 +1,55 @@
-#!/bin/bash
+#!/bin/bash -x
 #
 #THIS IS A COMPILATION OF THE IDEAS OF NUMEROUS PEOPLE
 #works for version 1.0.9 of spotify
 
 # set commercial mute, so we do not neet to listen to them
 
-when-changed ~/bin/spotify_blacklist.txt -c "kill $$" &
+DIR=$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )
 
-xprop -spy -id $(wmctrl -lx | awk -F' ' '$3 == "spotify.Spotify" {print $1}') _NET_WM_NAME |
+get_pactl_nr(){
+    LC_ALL=C pacmd list-sink-inputs | awk -v binary="spotify" '
+            $1 == "index:" {idx = $2}
+            $1 == "application.process.binary" && $3 == "\"" binary "\"" {print idx; exit}
+        '
+    # awk script by Glenn Jackmann (http://askubuntu.com/users/10127/)
+    # first posted on http://askubuntu.com/a/180661
+}
+
+mute(){
+    for PACTLNR in $(get_pactl_nr); do
+      pactl set-sink-input-mute "$PACTLNR" yes
+    done
+}
+
+unmute(){
+    for PACTLNR in $(get_pactl_nr); do
+        pactl set-sink-input-mute "$PACTLNR" no
+    done
+}
+
+ID=$(wmctrl -lx | awk -F' ' '$3 == "spotify.Spotify" {print $1}')
+
+if [[ $ID == "" ]]; then
+	exit 1;
+fi
+
+when-changed "${BASH_SOURCE[0]}" "$DIR/blacklist.txt" -c "kill $$" &
+
 while read -r XPROPOUTPUT; do
         XPROP_TRACKDATA="$(echo "$XPROPOUTPUT" | cut -d \" -f 2 )"
 
         # show something
-        echo "Checking against: $XPROP_TRACKDATA"
+        # echo "Checking against: $XPROP_TRACKDATA"
 
-        amixer -D pulse set Master unmute >> /dev/null
-	while read -r LINE; do
-            echo Checking $LINE
+        #amixer -D pulse set Master unmute
+        unmute
+        while read -r LINE; do
+            #echo Checking $LINE
             if grep -Fq "$LINE" <(echo "$XPROP_TRACKDATA"); then
-                echo "commercial: yes"
-                amixer -D pulse set Master mute >> /dev/null
-		break
+                #amixer -D pulse set Master mute
+                mute
+                break
             fi
-	done < ~/bin/spotify_blacklist.txt
-done
+        done < "$DIR/blacklist.txt"
+done < <(xprop -spy -id "$ID" _NET_WM_NAME)
