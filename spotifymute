@@ -1,3 +1,3 @@
 #!/bin/bash -x
 cd "$( dirname "${BASH_SOURCE[0]}" )"
-screen bash -x spotifymute_loop.sh
+screen ./spotifymute_loop.sh
