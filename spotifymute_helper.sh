@@ -70,15 +70,19 @@ main(){
             # echo "Checking against: $XPROP_TRACKDATA"
 
             #amixer -D pulse set Master unmute
-            mute_div no
+            NOT_IN=1
             while read -r LINE; do
                 #echo Checking $LINE
                 if grep -Fq "$LINE" <(echo "$XPROP_TRACKDATA"); then
+                    NOT_IN=0
                     #amixer -D pulse set Master mute
                     mute_div yes
                     break
                 fi
             done < "$DIR/blacklist.txt"
+            if [ $NOT_IN -eq 1 ]; then
+                mute_div no
+            fi
     done < <(xprop -spy -id "$ID" _NET_WM_NAME)
 }
 
