@@ -3,7 +3,6 @@ while true
 	do ./spotifymute_helper.sh
 	RET=$?
 	if [[ 1 -eq $RET ]]
-		then break
+		then sleep 2
 	fi
 done
-read SCRIPT_DONE
