@@ -31,7 +31,8 @@ unmute(){
 ID=$(wmctrl -lx | awk -F' ' '$3 == "spotify.Spotify" {print $1}')
 
 if [[ $ID == "" ]]; then
-	exit 1;
+        unmute
+        exit 1;
 fi
 
 when-changed "${BASH_SOURCE[0]}" "$DIR/blacklist.txt" -c "kill $$" &
