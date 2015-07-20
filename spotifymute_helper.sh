@@ -24,25 +24,21 @@ netw_prepare(){
     NETW=0
     if [[ $PULSE_SERVER != "" ]]; then
         NETW=1
-        #PIP=$(mktemp -u)
-        #mkfifo "$PIP"
-        PSWDF=$(mktemp)
-        cat > $PSWDF
-        #REMOTE=$(sshpass -f $PSWDF ssh "$PULSE_SERVER" "mktemp")
-        #rsync --rsh="sshpass -f $PSWDF ssh $PULSE_SERVER" "$0" $REMOTE
-        #cat $PIP | sshpass -f $PSWDF ssh "$PULSE_SERVER" "chmod +x $REMOTE; $REMOTE" &
-	#echo DONE CATTING SCRIPT
+        PASSWD_FILE=$(mktemp)
+        chmod go-rwx "$PASSWD_FILE"
+        #read -s $SSHPASS
+        echo "Enter password for ssh (will echo)"
+        cat > "$PASSWD_FILE"
     fi
 }
 
 mute_div(){
     if [ $NETW -eq 1 ]; then
-        #echo "mute '$@'" > "$PIP"
         if [[ "$@" == yes ]]; then
-            sshpass -f $PSWDF ssh "$PULSE_SERVER" "amixer -D pulse set Master mute"
+            sshpass -f "$PASSWD_FILE" ssh "$PULSE_SERVER" "amixer -D pulse set Master mute"
         else
             #echo "amixer -D pulse set Master unmute" > $PIP
-            sshpass -f $PSWDF ssh "$PULSE_SERVER" "amixer -D pulse set Master unmute"
+            sshpass -f "$PASSWD_FILE" ssh "$PULSE_SERVER" "amixer -D pulse set Master unmute"
         fi
     else
         mute "$@"
@@ -62,9 +58,9 @@ main(){
             exit 1;
     fi
 
-    trap "mute_div no && trap - SIGTERM && kill -- -$$" SIGINT SIGTERM EXIT
+    trap "rm -f $PASSWD_FILE && mute_div no && trap - SIGTERM && kill -- -$$" SIGINT SIGTERM EXIT
 
-    when-changed "${BASH_SOURCE[0]}" "$DIR/blacklist.txt" -c "kill $$" &
+    $DIR/when-changed "${BASH_SOURCE[0]}" "$DIR/blacklist.txt" -c "kill $$" &
 
     while read -r XPROPOUTPUT; do
             XPROP_TRACKDATA="$(echo "$XPROPOUTPUT" | cut -d \" -f 2 )"
