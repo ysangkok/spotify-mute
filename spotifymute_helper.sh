@@ -58,7 +58,8 @@ main(){
             exit 1;
     fi
 
-    trap "rm -f $PASSWD_FILE && mute_div no && trap - SIGTERM && kill -- -$$" SIGINT SIGTERM EXIT
+    trap "exit" INT TERM
+    trap "rm -f $PASSWD_FILE; mute_div no; kill 0" EXIT
 
     $DIR/when-changed "${BASH_SOURCE[0]}" "$DIR/blacklist.txt" -c "kill $$" &
 
