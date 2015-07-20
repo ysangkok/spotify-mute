@@ -35,6 +35,8 @@ if [[ $ID == "" ]]; then
         exit 1;
 fi
 
+trap "echo Dying!; exit" TERM
+
 when-changed "${BASH_SOURCE[0]}" "$DIR/blacklist.txt" -c "kill $$" &
 
 while read -r XPROPOUTPUT; do
