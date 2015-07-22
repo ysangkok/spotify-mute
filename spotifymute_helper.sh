@@ -1,4 +1,4 @@
-#!/bin/bash -x
+#!/bin/bash
 #
 #THIS IS A COMPILATION OF THE IDEAS OF NUMEROUS PEOPLE
 #works for version 1.0.9 of spotify
@@ -33,6 +33,7 @@ netw_prepare(){
 }
 
 mute_div(){
+    echo Muting... "$@"
     if [ $NETW -eq 1 ]; then
         if [[ "$@" == yes ]]; then
             sshpass -f "$PASSWD_FILE" ssh "$PULSE_SERVER" "amixer -D pulse set Master mute"
@@ -58,16 +59,16 @@ main(){
             exit 1;
     fi
 
-    trap "exit" INT TERM
-    trap "rm -f $PASSWD_FILE; mute_div no; kill 0" EXIT
+    trap "exit" USR1
+    trap "rm -f $PASSWD_FILE; mute_div no; kill -USR1 0" INT
 
-    $DIR/when-changed "${BASH_SOURCE[0]}" "$DIR/blacklist.txt" -c "kill $$" &
+    $DIR/when-changed "${BASH_SOURCE[0]}" "$DIR/blacklist.txt" -c "kill -USR1 $$ 2>&1" &
 
     while read -r XPROPOUTPUT; do
             XPROP_TRACKDATA="$(echo "$XPROPOUTPUT" | cut -d \" -f 2 )"
 
             # show something
-            # echo "Checking against: $XPROP_TRACKDATA"
+            echo "Checking against: $XPROP_TRACKDATA"
 
             #amixer -D pulse set Master unmute
             NOT_IN=1
