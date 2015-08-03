@@ -1,9 +1,8 @@
 #!/bin/bash
 #
-#THIS IS A COMPILATION OF THE IDEAS OF NUMEROUS PEOPLE
-#works for version 1.0.9 of spotify
-
+# THIS IS A COMPILATION OF THE IDEAS OF NUMEROUS PEOPLE
 # set commercial mute, so we do not neet to listen to them
+# initial source: https://gist.github.com/pcworld/3198763#gistcomment-1265863
 
 get_pactl_nr(){
     LC_ALL=C pacmd list-sink-inputs | awk -v binary="spotify" '
