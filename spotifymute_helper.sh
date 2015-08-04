@@ -25,13 +25,15 @@ get_pactl_nr(){
 
 mute(){
     for PACTLNR in $(get_pactl_nr); do
-        if is_sink_input_corked $PACTLNR; then # returns 0 when not-corked, bash things unequal 0 false, try `if $(exit 3); then echo trudat; else echo noway; fi`
-             pactl set-sink-input-mute "$PACTLNR" "$@"
-        else
+        pactl set-sink-input-mute "$PACTLNR" "$@"
+        if ! is_sink_input_corked $PACTLNR; then # returns 1 when corked, unequal 0 means false, try `if $(exit 3); then echo trudat; else echo noway; fi`
             if [[ $1 == "yes" ]]; then
                 echo "Sink input corked, unmuting"
-                pactl set-sink-input-mute "$PACTLNR" no
-                (sleep 1; mute $1)&
+                sleep 1
+                if ! is_sink_input_corked $PACTLNR; then
+                     mute no
+                fi
+                break
             fi
         fi
     done
