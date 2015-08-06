@@ -28,10 +28,13 @@ mute(){
         pactl set-sink-input-mute "$PACTLNR" "$@"
         if ! is_sink_input_corked $PACTLNR; then # returns 1 when corked, unequal 0 means false, try `if $(exit 3); then echo trudat; else echo noway; fi`
             if [[ $1 == "yes" ]]; then
-                echo "Sink input corked, unmuting"
+                echo "Sink input corked... let's just check again :P" # this is a workaround for a glitch where spotify will be corked while loading. if we didn't check again, we would be unmuted after the ad starts playing, which would be bad
                 sleep 1
                 if ! is_sink_input_corked $PACTLNR; then
+                     echo "still corked, unmuting"
                      mute no
+                else
+                     echo "not corked anymore, not unmuting"
                 fi
                 break
             fi
