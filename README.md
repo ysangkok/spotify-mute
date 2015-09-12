@@ -1,7 +1,7 @@
 # spotify-blacklist-mute
 *for muting ads*
 
-**NOTE: THIS PROJECT IS DORMANT**. This project is based on blacklisting. When Spotify has DBUS support (versions 1.0.0-1.0.11 did not), blacklisting isn't needed, and you can use blockify. If blockify breaks for you, let me know, and I'll fix this script.
+**NOTE: THIS PROJECT IS INFERIOR**. This project is based on blacklisting. When Spotify has DBUS support (versions 1.0.0-1.0.11 did not, but 1.0.13 has), blacklisting isn't needed, and you can use blockify. Still, if blockify breaks for you and this script is not working, let me know, and I'll fix it.
 
 Tested with version 1.0.9 and 1.0.11 (Linux). May work on BSD too.
 
