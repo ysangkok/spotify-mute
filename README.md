@@ -1,9 +1,7 @@
 # spotify-blacklist-mute
 *for muting ads*
 
-**NOTE: THIS PROJECT IS INFERIOR**. This project is based on blacklisting. When Spotify has DBUS support (versions 1.0.0-1.0.11 did not, but 1.0.13 has), blacklisting isn't needed, and you can use blockify. Still, if blockify breaks for you and this script is not working, let me know, and I'll fix it.
-
-Tested with version 1.0.9 and 1.0.11 (Linux). May work on BSD too.
+Tested with version 1.0.14 (Linux). May work on BSD too.
 
 Only mutes the Spotify sink when running locally. If `PULSE_SERVER` is defined, it will mute all audio on the remote machine using SSH (will ask for password and save it. Pretty unsafe but it is meant for usage on machines you trust).
 
@@ -15,3 +13,4 @@ Todo
 ----
 
 * Use https://bitbucket.org/SpartanJ/efsw to support FreeBSD also.
+* Mute PulseAudio sink on remote host instead of all audio

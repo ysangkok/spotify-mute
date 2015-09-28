@@ -90,6 +90,12 @@ main(){
     while read -r XPROPOUTPUT; do
         XPROP_TRACKDATA="$(echo "$XPROPOUTPUT" | cut -d \" -f 2 )"
 
+        if dbus-send --print-reply --dest=org.mpris.MediaPlayer2.spotify /org/mpris/MediaPlayer2 org.freedesktop.DBus.Properties.Get string:'org.mpris.MediaPlayer2.Player' string:'Metadata' | grep spotify:ad; then
+            echo "Ad found over DBUS"
+            mute_div yes
+            continue
+        fi
+
         # show something
         echo "Checking against: $XPROP_TRACKDATA"
 
