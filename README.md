@@ -1,6 +1,8 @@
 # spotify-blacklist-mute
 *for muting ads*
 
+** For a Windows version see https://github.com/digfish/spotify-blacklist-mute-windows **
+
 Note that the name has become a misnomer, since automatic ad-detection over DBUS is working again now. The blacklist is still used, but no longer needs to be updated.
 
 Tested with version 1.0.77 (Linux). May work on BSD too.
