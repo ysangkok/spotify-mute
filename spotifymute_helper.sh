@@ -85,32 +85,11 @@ main(){
     trap "exit" USR1
     trap "mute_div no; kill -USR1 0" INT
 
-    $DIR/when-changed "${BASH_SOURCE[0]}" "$DIR/blacklist.txt" -c "kill -USR1 $$ 2>&1" &
-
     while read -r XPROPOUTPUT; do
-        XPROP_TRACKDATA="$(echo "$XPROPOUTPUT" | cut -d \" -f 2 )"
-
         if dbus-send --print-reply --dest=org.mpris.MediaPlayer2.spotify /org/mpris/MediaPlayer2 org.freedesktop.DBus.Properties.Get string:'org.mpris.MediaPlayer2.Player' string:'Metadata' | grep spotify:ad; then
             echo "Ad found over DBUS"
             mute_div yes
-            continue
-        fi
-
-        # show something
-        echo "Checking against: $XPROP_TRACKDATA"
-
-        #amixer -D pulse set Master unmute
-        NOT_IN=1
-        while read -r LINE; do
-            #echo Checking $LINE
-            if grep -Fq "$LINE" <(echo "$XPROP_TRACKDATA"); then
-                NOT_IN=0
-                #amixer -D pulse set Master mute
-                mute_div yes
-                break
-            fi
-        done < "$DIR/blacklist.txt"
-        if [ $NOT_IN -eq 1 ]; then
+        else
             mute_div no
         fi
     done < <(xprop -spy -id "$ID" _NET_WM_NAME)
